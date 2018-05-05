@@ -8,7 +8,6 @@
       return props.sizes.map(function(num) {
         
         return (
-          
           <option value={num} key={num}>
             {num}
           </option>
@@ -22,7 +21,6 @@
     }
 
     return (
-      
       <div className="field-group">
         <label htmlFor="size-options">Size:</label>
         <select
@@ -50,23 +48,36 @@
       });
     }
 
-    return (
+    function onColorChange(evt) {
       
+      props.handleColorChange(evt.target.value);
+      
+    }
+
+    return (
       <div className="field-group">
         <label htmlFor="color-options">Color:</label>
-        <select defaultValue={props.color} name="colorOptions" id="color-options">
+        <select
+          defaultValue={props.color}
+          name="colorOptions"
+          id="color-options"
+          onChange={onColorChange}>
           {colorOptions()}
         </select>
       </div>
     );
   }
-  
-  //start here
+
+
+//start here
 
   function ProductImage(props) {
     
-    return <img src={`../../../assets/${props.color}.jpg`} alt="Product Image" />;
-    
+    return (
+      <img src={`../../../assets/${props.color}.jpg`} alt="Product Image" />
+      
+      
+    );
   }
 
   var ProductCustomizer = createReactClass({
@@ -87,14 +98,33 @@
       var availableColors = window.Inventory.bySize[selectedSize];
 
       this.setState({
-        colors: availableColors
+        colors: availableColors,
+        size: selectedSize
         
       });
+// super confusing, but understand it
+      if (availableColors.indexOf(this.state.color) === -1) {
+        this.setState({ color: availableColors[0] });
+      }
     },
 
+    handleColorChange: function(selectedColor) {
+      
+      var availableSizes = window.Inventory.byColor[selectedColor];
 
+      this.setState({
+        sizes: availableSizes,
+        color: selectedColor
+      });
+
+      if (availableSizes.indexOf(this.state.size) === -1) {
+        
+        this.setState({ size: availableSizes[0] });
+      }
+    },
 
     render: function() {
+      
       return (
         <div className="customizer">
           <div className="product-image">
@@ -105,14 +135,22 @@
               size={this.state.size}
               sizes={this.state.sizes}
               handleSizeChange={this.handleSizeChange}
-              
             />
-            <ColorSelector color={this.state.color} colors={this.state.colors} />
+            <ColorSelector
+              color={this.state.color}
+              colors={this.state.colors}
+              handleColorChange={this.handleColorChange}
+            />
+            
           </div>
+          
         </div>
+        
+        
       );
     }
   });
+  
 
   ReactDOM.render(<ProductCustomizer />, document.getElementById("react-root"));
 })();
